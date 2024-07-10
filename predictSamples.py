@@ -33,15 +33,6 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-# Function to parse arguments
-def parse_arguments(args):
-    params = {}
-    for arg in args:
-        if '=' in arg:
-            key, value = arg.split('=', 1)
-            params[key] = value
-    return params
-
 args = parse_args()
 image_format = args.image_format
 data_dir = args.data_dir
