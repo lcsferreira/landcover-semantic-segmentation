@@ -213,8 +213,8 @@ if "train_epochs" in params:
     EPOCHS = int(params['train_epochs'])
     print(f"Training epochs: {EPOCHS}")
 else:
-    print("Training epochs not provided. Defaulting to 20...")
-    EPOCHS = 20
+    print("Training epochs not provided. Defaulting to 30...")
+    EPOCHS = 30
     
 # define loss function
 loss = smp.utils.losses.DiceLoss()
