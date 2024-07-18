@@ -113,8 +113,11 @@ norm = colors.BoundaryNorm(bounds, cmap.N)
 # plt.imsave('pred_segmented_deepglobe_v4.png', final_prediction)
 # plt.imsave('test_deepglobe/N-34-66-C-c-4-3.tif_mask.jpg', original_mask)
 final_prediction = colour_code_segmentation(final_prediction, select_class_rgb_values)
+
+# ValueError: Image RGB array must be uint8 or floating point; found int32
+final_prediction = final_prediction.astype(np.uint8)
 ###################
-image = Image.open(input_image)
+image = Image.open(args.input_image)
 plt.imsave(output_image_name, final_prediction)
 # Plot the images
 plt.figure(figsize=(12, 12))
