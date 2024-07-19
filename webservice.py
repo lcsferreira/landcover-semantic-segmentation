@@ -3,8 +3,6 @@ import torch
 import numpy as np
 import pandas as pd
 from PIL import Image
-import matplotlib.pyplot as plt
-from matplotlib import colors
 from flask import Flask, request, jsonify, send_file
 from io import BytesIO
 import segmentation_models_pytorch as smp
