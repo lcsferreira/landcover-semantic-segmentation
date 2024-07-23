@@ -134,3 +134,5 @@ Werkzeug==3.0.3
 wheel==0.43.0
 wrapt==1.16.0
 zipp==3.17.0
+# python3-opencv
+# opencv-python-headless==4.5.3.56

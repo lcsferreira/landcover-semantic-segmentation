@@ -22,6 +22,8 @@ N_DIVISIONS = 2
 N_CLASSES = 7
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+print(f"Dispositivo: {DEVICE}")
+
 # Carregar modelo
 if os.path.exists(MODEL_PATH):
     model = torch.load(MODEL_PATH, map_location=DEVICE)
