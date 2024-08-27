@@ -7,7 +7,7 @@ This is a repository containing the code for my final project. In it you can tra
 You can train a DeepLabV3+ model with the command below
 
 ```bash
-python app.py data_dir="data" encoder="resnet101" encoder_weights="imagenet" activation="softmax2d" train=True train_epochs=5 model_name="deepGlobe_resnet101.pth"
+python app.py data_dir="data" encoder="resnet101" encoder_weights="imagenet" activation="softmax2d" train=True train_epochs=5 model_name="deepGlobe_resnet101_v2.pth"
 ```
 
 ## Predict Image
@@ -15,7 +15,7 @@ python app.py data_dir="data" encoder="resnet101" encoder_weights="imagenet" act
 You can generate a mask for a satellite image of your choice with the command below
 
 ```bash
-python predict_image.py --data-dir data --input-image tcc_image.jfif --output-image-name pred_resnet101.png --encoder resnet101 --weights imagenet --model-path deepGlobeResnet101.pth --patch-size 256 --n-divisions 2 --n-classes 7
+python predict_image.py --data-dir data --input-image tcc_image.jfif --output-image-name best_model_v4_testando_eval.png --encoder resnet50 --weights imagenet --model-path best_model_v4.pth --patch-size 512 --n-divisions 4 --n-classes 7
 ```
 
 ## Documentation for each prompt example

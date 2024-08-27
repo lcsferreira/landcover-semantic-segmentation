@@ -90,10 +90,12 @@ for idx, tile_img in enumerate(images_list):
   x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0).float()
   x_tensor = x_tensor.permute(0,3,1,2)
   # Predict test image
-  pred_mask = model(x_tensor)
-  pred_mask = pred_mask.detach().squeeze().cpu().numpy()
-  # Convert pred_mask from `CHW` format to `HWC` format
-  pred_mask = np.transpose(pred_mask,(1,2,0))
-  # Get prediction channel corresponding to foreground
-  pred_mask = colour_code_segmentation(reverse_one_hot(pred_mask), select_class_rgb_values)
-  cv2.imwrite(os.path.join(output_folder, f"pred_{idx}.png"), np.hstack([pred_mask])[:,:,::-1])
+  with torch.no_grad():
+    model.eval()
+    pred_mask = model(x_tensor)
+    pred_mask = pred_mask.detach().squeeze().cpu().numpy()
+    # Convert pred_mask from `CHW` format to `HWC` format
+    pred_mask = np.transpose(pred_mask,(1,2,0))
+    # Get prediction channel corresponding to foreground
+    pred_mask = colour_code_segmentation(reverse_one_hot(pred_mask), select_class_rgb_values)
+    cv2.imwrite(os.path.join(output_folder, f"pred_{idx}.png"), np.hstack([pred_mask])[:,:,::-1])

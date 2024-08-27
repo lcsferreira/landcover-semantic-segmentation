@@ -1,3 +1,17 @@
 data
 dataDeepGlobe
 dataLandCover
+previsoes
+previsoes_VALID
+previsoes_VALID_nosmooth
+data_tcc
+logs
+.dopckerignore
+previsoes_1024_VALID_nosmooth
+*.pth
+*.png
+*.jpg
+*.jpeg
+*.jfif
+*.txt
+*.pyc

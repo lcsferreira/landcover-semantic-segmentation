@@ -76,9 +76,17 @@ def colour_code_segmentation(image, label_values):
   
 def get_training_augmentation():
   train_transform = [
-      album.HorizontalFlip(p=0.5),
-      album.VerticalFlip(p=0.5),
-  ]
+        album.HorizontalFlip(p=0.5),
+        album.VerticalFlip(p=0.5),
+        # album.RandomRotate90(p=0.5),
+        # album.RandomBrightnessContrast(p=0.2),
+        # album.RandomGamma(p=0.2),
+        # album.ElasticTransform(alpha=1.0, sigma=50.0, p=0.5),
+        # album.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),
+        # album.CLAHE(clip_limit=2.0, p=0.5),
+        # album.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20, p=0.5),
+        # album.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+    ]
   return album.Compose(train_transform)
 
 
@@ -86,6 +94,7 @@ def get_validation_augmentation():
     train_transform = [
         album.HorizontalFlip(p=0.5),
         album.VerticalFlip(p=0.5),
+        # album.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
     ]
     return album.Compose(train_transform)
 

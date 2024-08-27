@@ -160,18 +160,18 @@ if 'activation' in params:
     print(f"Activation: {ACTIVATION}")
 else:
     print("Activation not provided. Defaulting to 'softmax2d'...")
-    ACTIVATION = 'softmax2d' 
+    ACTIVATION = 'softmax' 
 
 # ENCODER = 'resnet101'
 # ENCODER_WEIGHTS = 'imagenet'
-# ACTIVATION = 'softmax2d' # could be None for logits or 'softmax2d' for multiclass segmentation
+# ACTIVATION = 'softmax' # could be None for logits or 'softmax2d' for multiclass segmentation
 
 # create segmentation model with pretrained encoder
 model = smp.DeepLabV3Plus(
-    encoder_name=ENCODER, 
-    encoder_weights=ENCODER_WEIGHTS, 
-    classes=len(CLASSES), 
-    activation=ACTIVATION,
+    encoder_name="resnet50", 
+    encoder_weights="imagenet", 
+    classes=7, 
+    activation="softmax",
 )
 
 preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
@@ -221,18 +221,43 @@ loss = smp.utils.losses.DiceLoss()
 
 # define metrics
 metrics = [
-    smp.utils.metrics.IoU(threshold=0.5),
+    smp.utils.metrics.IoU(),
+    smp.utils.metrics.Accuracy(),
+    smp.utils.metrics.Fscore(),
+    smp.utils.metrics.Precision(),
+    smp.utils.metrics.Recall(),
+    
 ]
 
-# define optimizer
 optimizer = torch.optim.Adam([ 
-    dict(params=model.parameters(), lr=0.00001),
+    dict(params=model.parameters(), lr=0.00001, weight_decay=0.0001),
 ])
 
-# define learning rate scheduler (not used in this NB)
-lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-    optimizer, T_0=1, T_mult=2, eta_min=5e-5,
-)
+class EarlyStopping:
+    def __init__(self, patience=5):
+        self.patience = patience
+        self.counter = 0
+        self.best_score = None
+        self.early_stop = False
+
+    def __call__(self, score, model, model_path):
+        if self.best_score is None:
+            self.best_score = score
+            self.save_checkpoint(score, model, model_path)
+        elif score < self.best_score:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+        else:
+            self.best_score = score
+            self.save_checkpoint(score, model, model_path)
+            self.counter = 0
+
+    def save_checkpoint(self, score, model, model_path):
+        torch.save(model, model_path)
+        print('Model saved!')
+
+early_stopping = EarlyStopping(patience=5)
 
 # load best saved model checkpoint from previous commit (if present)
 model_name = params['model_name']
@@ -263,7 +288,7 @@ if TRAIN:
 
     best_iou_score = 0.0
     train_logs_list, valid_logs_list = [], []
-
+    0.0001
     for i in range(0, EPOCHS):
 
         # Perform training & validation
@@ -272,12 +297,14 @@ if TRAIN:
         valid_logs = valid_epoch.run(valid_loader)
         train_logs_list.append(train_logs)
         valid_logs_list.append(valid_logs)
-
-        # Save model if a better val IoU score is obtained
-        if best_iou_score < valid_logs['iou_score']:
-            best_iou_score = valid_logs['iou_score']
-            torch.save(model, model_name)
-            print('Model saved!')
+        
+        # Early stopping
+        early_stopping(valid_logs['iou_score'], model, model_name)
+        if early_stopping.early_stop:
+            print("Early stopping")
+            break
+            
+            
             
 # create test dataloader to be used with DeepLabV3+ model (with preprocessing operation: to_tensor(...))
 test_dataset = LandCoverDataset(

@@ -81,18 +81,20 @@ input_image = image
 def predict_mask(img_batch_subdiv):
     img_batch_subdiv = torch.from_numpy(img_batch_subdiv).to(DEVICE).float()
     img_batch_subdiv = img_batch_subdiv.permute(0,3,1,2)
-    img_batch_subdiv = model(img_batch_subdiv)
-    img_batch_subdiv = img_batch_subdiv.detach().squeeze().cpu().numpy()
-    # print(img_batch_subdiv.shape) #(55, 7, 256, 256)
-    # Convert pred_mask from `CHW` format to `HWC` format
-    img_batch_subdiv = np.transpose(img_batch_subdiv,(0,2,3,1))
-    
-    return  img_batch_subdiv
+    with torch.no_grad():
+        model.eval()
+        img_batch_subdiv = model(img_batch_subdiv)
+        img_batch_subdiv = img_batch_subdiv.detach().squeeze().cpu().numpy()
+        # print(img_batch_subdiv.shape) #(55, 7, 256, 256)
+        # Convert pred_mask from `CHW` format to `HWC` format
+        img_batch_subdiv = np.transpose(img_batch_subdiv,(0,2,3,1))
+        
+        return  img_batch_subdiv
 
 predictions_smooth = predict_img_with_smooth_windowing(
     input_image,
     window_size=patch_size,
-    subdivisions=2,  # Minimal amount of overlap for windowing. Must be an even number.
+    subdivisions=n_divisions,  # Minimal amount of overlap for windowing. Must be an even number.
     nb_classes=n_classes,
     pred_func=(
         lambda img_batch_subdiv: predict_mask((img_batch_subdiv))
